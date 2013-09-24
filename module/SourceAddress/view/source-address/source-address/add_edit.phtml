@@ -1,0 +1,109 @@
+<?php $form = $this->source_addressForm; ?>
+<div class="title">
+	<h3><?php echo $this->pageTitle;?></h3>
+	<hr />
+</div>
+<div class="margin-top20">
+	<div class="source_address-container">
+		<?php echo $this->form()->openTag($form);?>
+		<?php echo $this->formRow($form->get('source_address_id')); ?>
+			<div class="control-group">
+			<label class="control-label" for="descripton">Description</label>
+			<div class="controls">
+				<?php echo $this->formRow($form->get('description')); ?>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label" for="contact">Contact</label>
+			<div class="controls">
+				<?php echo $this->formRow($form->get('contact')); ?>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label" for="address">Address</label>
+			<div class="controls">
+				<?php echo $this->formRow($form->get('address')); ?>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label" for="phone">Phone</label>
+			<div class="controls">
+				<?php echo $this->formRow($form->get('phone')); ?>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label" for="cell">Cell</label>
+			<div class="controls">
+				 <?php echo $this->formRow($form->get('cell')); ?>
+                </div>
+		</div>
+		<div class="controls">
+            <?php echo $this->formSubmit($form->get('submit')); ?>
+		</div>
+		<?php echo $this->form()->closeTag(); ?>
+	</div>
+</div>
+
+<div id="invalid-source_address-template" class="modal hide fade">
+	<div class="modal-body">
+		<div class="alert  alert-block">
+			<button type="button" class="close" data-dismiss="modal">&times;</button>
+			<h4>SourceAddress Not Saved!</h4>
+			<h5>Please check below shown errors:</h5>
+			<div id="source_address-errors"></div>
+		</div>
+	</div>
+</div>
+<div id="valid-source_address-template" class="modal hide fade">
+	<div class="modal-body">
+		<div class="alert  alert-success">
+			<button type="button" class="close" data-dismiss="modal">&times;</button>
+			<h4>Source Address saved successfuly</h4>
+			<div id="source_address-messages">You will now be redirected to
+				source_address listings.</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+$(document).ready(function(){
+	$(document).on("submit","#frm_source_address",function(e){
+		if(!e.isDefaultPrevented()){
+			var source_addressForm = $(this);
+			var message = false;
+			source_addressForm.queue(function(next){
+				message = new Message({
+                    beforeShow:function (self) {
+                        this.alternateMessage = this.showLoadingMessage("Please wait while saving source_address...");
+                    },
+                    onBlock:next
+                });
+			}).queue(function(next){
+				$.ajax({
+					url : source_addressForm.attr("action"),
+					data : source_addressForm.serialize(),
+					type : "POST",
+					dataType : "json",
+					success : function(data){
+						if(data.response && data.response.success && data.redirect_url){
+							$("#valid-source_address-template").modal("show");
+							setTimeout(function(){
+								document.location.href = data.redirect_url;
+							},1000);
+						} else {
+							$("#source_address-errors").html(data.response.message);
+							$("#invalid-source_address-template").modal("show");
+						}
+					},
+					error : function(){
+						next();
+					} 
+				}).complete(next);
+			}).queue(function(next){
+				message.close();
+				next();
+			});
+			e.preventDefault();
+		}
+	});
+});
+</script>

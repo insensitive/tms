@@ -1,0 +1,147 @@
+<?php $this->headLink()->appendStylesheet($this->basePath() . '/libs/datatables/css/datatables.css')?>
+<?php $this->headLink()->appendStylesheet($this->basePath() . '/libs/datatables/css/datatables.bootstrap.css')?>
+
+<?php $this->headScript()->appendFile($this->basePath() . '/libs/datatables/js/datatables.min.js')?>
+<?php $this->headScript()->appendFile($this->basePath() . '/libs/datatables/js/datatables.bootstrap.js')?>
+<?php $this->headScript()->appendFile($this->basePath() . '/libs/datatables/js/datatables.aksplugin.js')?>
+
+<h2>
+	Trucks
+	<a href="<?php echo $this->url("truck",array("controller"=>"truck","action" => "add"));?>" class="btn btn-primary pull-right">Add Truck</a>
+</h2>
+<div class="row-fluid margin-top20">
+	<div class="span12">
+		<table class="table no-delete" id="tblProduct">
+			<thead>
+				<tr>
+				    <th>ID</th>
+				    <th>Shipper</th>
+					<th>Name</th>
+					<th>Number</th>
+					<th>Status</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td colspan="6" class="dataTables_empty"><?php echo $this->translate('Loading truck list'); ?></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+<div id="activate-truck-template" class="modal hide fade">
+    <div class="modal-header">
+        <h3>Active Truck?</h3>
+    </div>
+	<div class="modal-body">
+	   Are you sure you want to activate the truck?
+	   <ul>
+	       <li>Activating the truck will allow you to create new transport for the truck.</li>
+	   </ul>
+	</div>
+	<div class="modal-footer">
+        <button class="btn" data-dismiss="modal">Close</button>
+        <a href="#" class="continue btn btn-success" data-id="">Continue</a>
+	</div>
+</div>
+<div id="de-activate-truck-template" class="modal hide fade">
+    <div class="modal-header">
+        <h3>De-Active Truck?</h3>
+    </div>
+	<div class="modal-body">
+	   Are you sure you want to de-activate this truck?
+	   <ul>
+	       <li>No transport can assigned after de-activating a truck.</li>
+	       <li>Previous reports of the truck can still be visible.</li>
+	       <li>You can re-activate the truck anytime.</li>
+	   </ul>
+	</div>
+	<div class="modal-footer">
+        <button class="btn" data-dismiss="modal">Close</button>
+        <a href="#" class="continue btn btn-danger" data-id="">Continue</a>
+	</div>
+</div>
+<div id="waiting-template" class="modal hide fade" data-backdrop="static" data-keyboard="false">
+    <div class="modal-header">
+        <h3>Please Wait...</h3>
+    </div>
+	<div class="modal-body">
+		Please wait while changing status of truck.
+	</div>
+</div>
+<script type="text/javascript">
+<?php $this->headScript()->captureStart() ?>
+(function($){
+	$(document).ready(function(){
+		window.grid = dataTable({
+			"sDom": "<'row hide'<'span8'l><'span8'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
+			"sPaginationType": "bootstrap",
+			"oLanguage": {
+				"sLengthMenu": "_MENU_ records per page"
+			},
+			"aoColumns": [
+                            { "sName": "truck_id" },
+                            { "sName": "shipper_name"},
+                            { "sName": "name"},
+							{ "sName": "number"},
+							{ "sName": "status" },
+							{ "sName": "actions",bSortable:false}
+						 ],
+			id : $('#tblProduct'),
+			sAjaxSource: "<?php echo $this->url("truck",array("controller"=>"truck","action"=>"grid"));?>"
+		});
+	});
+	$(document).on("click",".toggleStatus",function(){
+		var self = $(this);
+		var isActive = self.attr("data-active");
+		var activateTruckModal = $("#activate-truck-template");
+		var deActivateTruckModal = $("#de-activate-truck-template")
+		var id = self.data("id");
+		if(isActive == "true"){
+			deActivateTruckModal.find(".continue").attr("data-id",id);
+			deActivateTruckModal.modal("show");
+		} else {
+			activateTruckModal.find(".continue").attr("data-id",id);
+			activateTruckModal.modal("show");
+		}
+	});
+	$(document).on("click",".continue",function(e){
+		if(!e.isDefaultPrevented()){
+			var self = $(this);
+			var truck_id = self.attr("data-id");
+			var modal = self.closest(".modal");
+			var waitingModal = $("#waiting-template");
+			self.queue(function(next){
+				modal.modal("hide");
+				modal.on("hidden",next);
+			}).queue(function(next){
+				waitingModal.modal("show");
+				waitingModal.on("shown",next);
+			}).queue(function(next){
+				$.ajax({
+					url : "<?php echo $this->url('truck',array('controller'=>'truck','action'=>'toggle-status'));?>",
+					data: {truck_id:truck_id},
+					cache:false,
+					type: "POST",
+					success: function(data){
+						if(data.success){
+							var targetElement = $(".toggleStatus[data-id="+data.truck_id+"]");
+							targetElement.html(data.status);
+							targetElement.removeClass("btn-danger btn-success").addClass(data["class"]);
+							targetElement.attr("data-active",(data.status.toLowerCase() == "active"?"true":"false"));
+						}
+					}
+				}).complete(next);
+			}).queue(function(next){
+				waitingModal.modal("hide");
+				modal.off("hidden");
+				waitingModal.off("shown");
+				next();
+			});
+			e.preventDefault();
+		}
+	});
+})(jQuery);
+<?php $this->headScript()->captureEnd() ?>
+</script>

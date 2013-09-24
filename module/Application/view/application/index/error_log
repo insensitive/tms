@@ -1,0 +1,1 @@
+[01-Aug-2013 13:41:11 America/Halifax] PHP Fatal error:  Using $this when not in object context in /home/iwsenerg/public_html/tms/module/Application/view/application/index/index.phtml on line 2

@@ -1,0 +1,2 @@
+[30-Jul-2013 18:37:32 America/Halifax] PHP Fatal error:  Using $this when not in object context in /home/iwsenerg/public_html/tms/module/User/view/user/user/index.phtml on line 1
+[30-Jul-2013 18:37:42 America/Halifax] PHP Fatal error:  Using $this when not in object context in /home/iwsenerg/public_html/tms/module/User/view/user/user/add_edit.phtml on line 1

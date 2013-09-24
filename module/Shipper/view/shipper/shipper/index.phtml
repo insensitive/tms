@@ -1,0 +1,153 @@
+<?php $this->headLink()->appendStylesheet($this->basePath() . '/libs/datatables/css/datatables.css')?>
+<?php $this->headLink()->appendStylesheet($this->basePath() . '/libs/datatables/css/datatables.bootstrap.css')?>
+
+<?php $this->headScript()->appendFile($this->basePath() . '/libs/datatables/js/datatables.min.js')?>
+<?php $this->headScript()->appendFile($this->basePath() . '/libs/datatables/js/datatables.bootstrap.js')?>
+<?php $this->headScript()->appendFile($this->basePath() . '/libs/datatables/js/datatables.aksplugin.js')?>
+
+<h2>
+	Shippers
+	<a href="<?php echo $this->url("shipper",array("controller"=>"shipper","action" => "add"));?>" class="btn btn-primary pull-right">Add Shipper</a>
+</h2>
+<div class="row-fluid margin-top20">
+	<div class="span12">
+		<table class="table no-delete" id="tblProduct">
+			<thead>
+				<tr>
+				    <th>ID</th>
+					<th>Name</th>
+					<th>Address</th>
+					<th>Office</th>
+					<th>Cell</th>
+					<th>Email</th>
+					<th>Rate</th>
+					<th>Status</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td colspan="9" class="dataTables_empty"><?php echo $this->translate('Loading shipper list'); ?></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+<div id="activate-shipper-template" class="modal hide fade">
+    <div class="modal-header">
+        <h3>Active Shipper?</h3>
+    </div>
+	<div class="modal-body">
+	   Are you sure you want to activate the shipper?
+	   <ul>
+	       <li>Activating the shipper will allow you to create new transport for the shipper.</li>
+	   </ul>
+	</div>
+	<div class="modal-footer">
+        <button class="btn" data-dismiss="modal">Close</button>
+        <a href="#" class="continue btn btn-success" data-id="">Continue</a>
+	</div>
+</div>
+<div id="de-activate-shipper-template" class="modal hide fade">
+    <div class="modal-header">
+        <h3>De-Active Shipper?</h3>
+    </div>
+	<div class="modal-body">
+	   Are you sure you want to de-activate this shipper?
+	   <ul>
+	       <li>No transport can assigned after de-activating a shipper.</li>
+	       <li>Previous reports of the shipper can still be visible.</li>
+	       <li>You can re-activate the shipper anytime.</li>
+	   </ul>
+	</div>
+	<div class="modal-footer">
+        <button class="btn" data-dismiss="modal">Close</button>
+        <a href="#" class="continue btn btn-danger" data-id="">Continue</a>
+	</div>
+</div>
+<div id="waiting-template" class="modal hide fade" data-backdrop="static" data-keyboard="false">
+    <div class="modal-header">
+        <h3>Please Wait...</h3>
+    </div>
+	<div class="modal-body">
+		Please wait while changing status of shipper.
+	</div>
+</div>
+<script type="text/javascript">
+<?php $this->headScript()->captureStart() ?>
+(function($){
+	$(document).ready(function(){
+		window.grid = dataTable({
+			"sDom": "<'row hide'<'span8'l><'span8'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
+			"sPaginationType": "bootstrap",
+			"oLanguage": {
+				"sLengthMenu": "_MENU_ records per page"
+			},
+			"aoColumns": [
+                            { "sName": "shipper_id" },
+                            { "sName": "name"},
+							{ "sName": "address",bSortable:false },
+							{ "sName": "office",bSortable:false },
+							{ "sName": "cell",bSortable:false },
+							{ "sName": "email" },
+							{ "sName": "rate" },
+							{ "sName": "status" },
+							{ "sName": "actions",bSortable:false}
+						 ],
+			id : $('#tblProduct'),
+			sAjaxSource: "<?php echo $this->url("shipper",array("controller"=>"shipper","action"=>"grid"));?>"
+		});
+	});
+	$(document).on("click",".toggleStatus",function(){
+		var self = $(this);
+		var isActive = self.attr("data-active");
+		var activateShipperModal = $("#activate-shipper-template");
+		var deActivateShipperModal = $("#de-activate-shipper-template")
+		var id = self.data("id");
+		if(isActive == "true"){
+			deActivateShipperModal.find(".continue").attr("data-id",id);
+			deActivateShipperModal.modal("show");
+		} else {
+			activateShipperModal.find(".continue").attr("data-id",id);
+			activateShipperModal.modal("show");
+		}
+	});
+	$(document).on("click",".continue",function(e){
+		if(!e.isDefaultPrevented()){
+			var self = $(this);
+			var shipper_id = self.attr("data-id");
+			var modal = self.closest(".modal");
+			var waitingModal = $("#waiting-template");
+			self.queue(function(next){
+				modal.modal("hide");
+				modal.on("hidden",next);
+			}).queue(function(next){
+				waitingModal.modal("show");
+				waitingModal.on("shown",next);
+			}).queue(function(next){
+				$.ajax({
+					url : "<?php echo $this->url('shipper',array('controller'=>'shipper','action'=>'toggle-status'));?>",
+					data: {shipper_id:shipper_id},
+					cache:false,
+					type: "POST",
+					success: function(data){
+						if(data.success){
+							var targetElement = $(".toggleStatus[data-id="+data.shipper_id+"]");
+							targetElement.html(data.status);
+							targetElement.removeClass("btn-danger btn-success").addClass(data["class"]);
+							targetElement.attr("data-active",(data.status.toLowerCase() == "active"?"true":"false"));
+						}
+					}
+				}).complete(next);
+			}).queue(function(next){
+				waitingModal.modal("hide");
+				modal.off("hidden");
+				waitingModal.off("shown");
+				next();
+			});
+			e.preventDefault();
+		}
+	});
+})(jQuery);
+<?php $this->headScript()->captureEnd() ?>
+</script>

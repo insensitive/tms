@@ -1,0 +1,110 @@
+<?php $company = $this->transport->getCompany();?>
+
+<div class="row-fluid">
+	<div class="span9">
+		<h2>
+			<?php echo $company->getName();?>
+		</h2>
+		<p>Contact No: <?php echo $company->getPhoneOffice();?> ( EXT: <?php echo $company->getPhoneOfficeExt(); ?> ), <?php echo $company->getPhoneCell(); ?></p>
+	</div>
+	<div class="span3">
+		<h4>Transport# <?php echo $this->transport->getTransportId();?></h4>
+		<span class="text-small small muted"><strong>Invoice Date:</strong> <?php echo date('M d Y'); ?></span><br />
+		<span class="text-small small muted"><strong>Weight:</strong> <?php echo $this->transport->getWeight(); ?></span><br />
+		<span class="text-small small muted"><strong>Rate:</strong> <?php echo number_format($company->getRate(),2); ?></span><br />
+		<span class="text-small small muted"><strong>Amount:</strong> <?php echo number_format($company->getRate() * $this->transport->getWeight(),2); ?></span>
+	</div>
+</div>
+<hr />
+
+<div class="well well-small">
+	<div class="row-fluid">
+		<div class="span3">
+			<h4>Shipping Company</h4>
+		</div>
+		<div class="span9">
+			<?php $shipper = $this->transport->getShipper();?>
+			<p>Name: <?php echo $shipper->getName();?></p>
+			<p>Contact No: <?php echo $shipper->getPhoneOffice();?> ( EXT: <?php echo $shipper->getPhoneOfficeExt(); ?> ), <?php echo $shipper->getPhoneCell(); ?></p>
+			<p>Source Description: <?php echo $this->transport->getSourceAddress()->getDescription();?></p>
+			<p>Source Address: <?php echo $this->transport->getSourceAddress()->getAddress();?></p>
+			<p>Source Contact: <?php echo $this->transport->getSourceAddress()->getContact();?></p>
+			<p>Source Phone: <?php echo $this->transport->getSourceAddress()->getPhone();?></p>
+			<p>Source Cell: <?php echo $this->transport->getSourceAddress()->getCell();?></p>
+		</div>
+	</div>
+</div>
+<div class="well well-small">
+	<div class="row-fluid">
+		<div class="span3">
+		<h4>Source Details</h4>
+		</div>
+		<div class="span9">
+			<p>Description: <?php echo $this->transport->getSourceAddress()->getDescription();?></p>
+			<p>Address: <?php echo $this->transport->getSourceAddress()->getAddress();?></p>
+			<p>Contact: <?php echo $this->transport->getSourceAddress()->getContact();?></p>
+			<p>Phone: <?php echo $this->transport->getSourceAddress()->getPhone();?></p>
+			<p>Cell: <?php echo $this->transport->getSourceAddress()->getCell();?></p>
+		</div>
+	</div>
+</div>
+<div class="well well-small">
+	<div class="row-fluid">
+		<div class="span3">
+		<h4>Destination Details</h4>
+		</div>
+		<div class="span9">
+			<p>Description: <?php echo $this->transport->getDestinationAddress()->getDescription();?></p>
+			<p>Address: <?php echo $this->transport->getDestinationAddress()->getAddress();?></p>
+			<p>Contact: <?php echo $this->transport->getDestinationAddress()->getContact();?></p>
+			<p>Phone: <?php echo $this->transport->getDestinationAddress()->getPhone();?></p>
+			<p>Cell: <?php echo $this->transport->getDestinationAddress()->getCell();?></p>
+			<p>Licence: <?php echo $this->transport->getDestinationAddress()->getLicence();?></p>
+			<p>Depth: <?php echo $this->transport->getDestinationAddress()->getDepth();?></p>
+		</div>
+	</div>
+</div>
+<!--<div class="well well-small">
+	<?php 
+	$truck = $this->transport->getTruck();
+	if($truck) {
+	?>
+		<div class="row-fluid">
+			<div class="span3">
+				<h4>Truck Details</h4>
+			</div>
+			<div class="span9">
+				<p>Name: <?php echo $truck->getName();?></p>
+				<p>Number: <?php echo $truck->getNumber()?></p>
+			</div>
+		</div>
+	<?php } ?>
+	
+	<?php 
+	$trailer = $this->transport->getTrailer();
+	if($trailer) {
+	?>
+		<div class="row-fluid">
+			<div class="span3">
+				<h4>Trailer Details</h4>
+			</div>
+			<div class="span9">
+				<p>Plate Number: <?php echo $trailer->getPlateNumber()?></p>
+				<p>Capacity: <?php echo $trailer->getCapacity()?></p>
+			</div>
+		</div>
+	<?php } ?>
+</div>
+<div class="well well-small">
+	<div class="row-fluid">
+		<div class="span3">
+			<h4>Driver Details</h4>
+		</div>
+		<div class="span9">
+			<?php $driver = $this->transport->getDriver();?>
+			<p>Name: <?php echo $driver->getName();?></p>
+			<p>License: <?php echo $driver->getLicense()?></p>
+			<p>Contact No: <?php echo $driver->getCell()?></p>
+		</div>
+	</div>
+</div>-->

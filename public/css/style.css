@@ -1,0 +1,23 @@
+body {
+    padding-bottom: 10px;
+}
+#logo{
+	max-height:70px;
+}
+
+th[aria-label="Actions"]{min-width:150px;}
+.no-delete th[aria-label="Actions"]{min-width:75px;}
+.no-edit th[aria-label="Actions"]{min-width:75px;}
+
+@media (max-width: 979px){
+	.nav-collapse .nav>li>a, .nav-collapse .dropdown-menu a{
+		color: #eee !important;
+		text-shadow: 0 0 0 !important;
+	}
+	.nav-collapse .nav>li>a:hover{
+		color: #117ec2 !important;
+	}
+	th[aria-label="Actions"]{min-width:100px;}
+	.no-delete th[aria-label="Actions"]{min-width:50px;}
+	.no-edit th[aria-label="Actions"]{min-width:50px;}
+}

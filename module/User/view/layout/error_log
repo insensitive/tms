@@ -1,0 +1,1 @@
+[30-Jul-2013 18:38:29 America/Halifax] PHP Fatal error:  Class 'AfcCommons\StaticOptions\StaticOptions' not found in /home/iwsenerg/public_html/tms/module/User/view/layout/layout.phtml on line 1

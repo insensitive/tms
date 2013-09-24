@@ -1,0 +1,9 @@
+@CHARSET "ISO-8859-1";
+div.confirm_wrapper{padding:5px;line-height: 20px;font-size: 14px;}
+div.confirm{text-align: right;margin-top:10px;}
+div.message_success{padding-left:30px;background-image: url("../img/message_success.png");background-position: left center;background-repeat: no-repeat;}
+div.message_error{padding-left:30px;background-image: url("../img/message_error.png");background-position: left center;background-repeat: no-repeat;}
+div.message_loading{padding-left:24px;background-image: url("../img/message_load.gif");background-position: left center;background-repeat: no-repeat;}
+.blockUI .button { margin-bottom: 0px; }
+
+@media (max-width: 600px){.blockMsg { left:20% !important;}}

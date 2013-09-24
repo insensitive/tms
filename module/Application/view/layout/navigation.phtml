@@ -1,0 +1,58 @@
+<?php $user = \AfcCommons\StaticOptions\StaticOptions::getCurrentUser();?>
+<?php $acl = new \AfcCommons\Permissions\Acl\Acl ( \AfcCommons\Permissions\Acl\Acl::$config ); ?>
+<ul class="nav">
+<?php
+$role = $user->getGroup ()->getName ();
+$navigation = $this->container;
+foreach ( $navigation->getPages () as $page ) {
+    
+    $resource = $page->getResource ();
+    $privilege = $page->getPrivilege ();
+    if ($page->isVisible ()) {
+        if ($acl->hasResource ( $resource ) && $acl->isAllowed ( $role, $resource, $privilege )) {
+            
+            // Get if there are any visible childrens
+            $hasVisibleChildrens = false;
+            $pageChilds = $page->getPages ();
+            
+            foreach ( $pageChilds as $tempPages ) {
+                if ($tempPages->isVisible ()) {
+                    $hasVisibleChildrens = true;
+                    break;
+                }
+            }
+            
+            if ($page->hasChildren () && $hasVisibleChildrens) {
+                $pageChilds = $page->getPages ();
+                echo '<li class="dropdown">';
+                echo '	<a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">' . $page->getLabel () . ' <b class="caret"></b></a>';
+                echo '	<ul class="dropdown-menu">';
+                foreach ( $pageChilds as $pageChild ) {
+                    $childResource = $pageChild->getResource ();
+                    $childPrivilege = $pageChild->getPrivilege ();
+                    if ($pageChild->isVisible ()) {
+                        if ($acl->hasResource ( $childResource ) && $acl->isAllowed ( $role, $childResource, $childPrivilege )) {
+                            if ($pageChild->isActive ()) {
+                                $class = ' class = "active" ';
+                            } else {
+                                $class = "";
+                            }
+                            echo '<li ' . $class . '><a href="' . $pageChild->getHref () . '">' . $pageChild->getLabel () . '</a></li>';
+                        }
+                    }
+                }
+                echo '	</ul>';
+                echo '</li>';
+            } else {
+                if ($page->isActive ()) {
+                    $class = ' class = "active" ';
+                } else {
+                    $class = "";
+                }
+                echo '<li ' . $class . '><a href="' . $page->getHref () . '">' . $page->getLabel () . '</a></li>';
+            }
+        }
+    }
+}
+?>
+</ul>

@@ -1,0 +1,1 @@
+[09-Aug-2013 18:55:11 America/Halifax] PHP Fatal error:  Using $this when not in object context in /home/iwsenerg/public_html/tms/module/Transport/view/transport/transport/invoice.phtml on line 6

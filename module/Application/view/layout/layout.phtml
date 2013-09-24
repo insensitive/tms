@@ -1,0 +1,99 @@
+<?php
+use AfcCommons\StaticOptions\StaticOptions;
+use AfcCommons\Permissions\Acl\Acl;
+$user = StaticOptions::getCurrentUser ();
+$acl = new Acl ( Acl::$config );
+?>
+<?php echo $this->doctype(); ?>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<?php echo $this->headTitle('IWS : '. $this->translate('Transport Management System'))->setSeparator(' - ')->setAutoEscape(false)?>
+<?php echo $this->headMeta()->appendName('viewport', 'width=device-width, initial-scale=1.0')?>
+<!-- Le styles -->
+<?php
+echo $this->headLink ( array ('rel' => 'shortcut icon', 'type' => 'image/vnd.microsoft.icon', 'href' => $this->basePath () . '/img/favicon.ico' ) )
+    ->prependStylesheet ( $this->basePath () . '/libs/bootstrap/css/bootstrap-responsive.min.css' )
+    ->prependStylesheet ( $this->basePath () . '/css/padding-margin.css' )
+    ->prependStylesheet ( $this->basePath () . '/css/style.css' )
+    ->prependStylesheet ( $this->basePath () . '/libs/bootstrap/css/bootstrap.min.css' )?>
+<!-- Scripts -->
+<?php
+echo $this->headScript ()
+    ->prependFile ( $this->basePath () . '/libs/html5/js/html5.js', 'text/javascript', array ( 'conditional' => 'lt IE 9' ) )
+    ->prependFile ( $this->basePath () . '/libs/blockui/js/message.js' )
+    ->prependFile ( $this->basePath () . '/libs/blockui/js/blockui.js' )
+    ->prependFile ( $this->basePath () . '/libs/bootstrap/js/bootstrap.min.js' )
+    ->prependFile ( $this->basePath () . '/libs/jquery/js/jquery-2.0.3.min.js' )?>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<div class="row">
+				<div class="span3">
+					
+				</div>
+			</div>
+			<div class="row-fluid">
+                <?php $user = StaticOptions::getCurrentUser();?>
+				<div class="span12">
+					<a href="<?php echo $this->url('home') ?>" class="pull-left"><img id="logo"
+						src="<?php echo $this->basePath()?>/images/IWS_Logo.png" alt="IWS" /></a>
+
+					<div class="pull-right margin-top20">
+						<ul class="nav nav-pills">
+							<li class="dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="#">Welcome <?php echo " ".$user->getFirstname();?> <b class="caret"></b></a>
+								<ul class="dropdown-menu">
+								    <li><a href="javascript:void(0);">My Profile</a></li>
+									<li class="divider"></li>
+									<li>
+									   <a href="<?php echo $this->url('user',array('controller'=>'logout','action'=>'index'));?>">Logout</a>
+								   </li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="navbar">
+    			<div class="navbar-inner">
+    				<div class="container">
+				        <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                            <span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
+                        </button>
+    					<a class="brand" href="<?php echo $this->url('home') ?>">
+    					   <span class="hidden-phone"><?php echo $this->translate('Transport Management System') ?></span>
+    					   <span class="visible-phone"><?php echo $this->translate('TMS') ?></span>
+					   </a>
+    					<div class="nav-collapse collapse">
+    				    <?php echo $this->navigation ( 'navigation' )->setRole ( $user->getGroup()->getName() )->setAcl ( $acl )->menu ()->setPartial("admin/navigation")->renderPartial();?>
+    					</div>
+    				</div>
+    			</div>
+            </div>
+		</header>
+		<div id="wrapper">
+            <?php
+                echo $this->navigation ( 'navigation' )
+                ->breadcrumbs ()
+                ->setRenderInvisible(true)
+                ->setLinkLast (false )
+                ->setMinDepth ( 0 )
+                ->setPartial('admin/breadcrumb');
+            ?>
+        	<?php echo $this->content; ?>
+        	<hr />
+		</div>
+		<footer>
+			<p class="text-center">&copy; 2012 - <?php echo date('Y') ?> by IWS Enery Group Inc. <?php echo $this->translate('All rights reserved.') ?></p>
+			<p class="pull-right hide"><?php echo $this->translate('Powered By: ') ?><a
+					target="_blank" href="http://www.atyantik.com"><strong>Atyantik
+						Technologies</strong></a>
+			</p>
+		</footer>
+	</div>
+	<!-- /container -->
+        <?php echo $this->inlineScript()?>
+    </body>
+</html>

@@ -1,0 +1,133 @@
+<?php $this->headLink()->appendStylesheet($this->basePath() . '/libs/wysiwyg/css/wysihtml5.css')?>
+<?php $this->headScript()->appendFile($this->basePath() . '/libs/wysiwyg/js/wysihtml5-0.3.0.js')?>
+<?php $this->headScript()->appendFile($this->basePath() . '/libs/wysiwyg/js/bootstrap-wysihtml5.js')?>
+<?php $form = $this->addForm; ?>
+<div class="title">
+	<h3><?php echo $this->pageTitle;?></h3>
+	<hr />
+</div>
+<div class="margin-top20 row-fluid">
+	<div class="user-add-container">
+		<?php echo $this->form()->openTag($form);?>
+		<?php echo $this->formRow($form->get('user_id')); ?>
+		 <div class="control-group">
+			<label class="control-label" for="firstname">Firstname</label>
+			<div class="controls">
+				<?php echo $this->formRow($form->get('firstname')); ?>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label" for="lastname">Lastname</label>
+			<div class="controls">
+				<?php echo $this->formRow($form->get('lastname')); ?>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label" for="password">Password</label>
+			<div class="controls">
+				<?php echo $this->formRow($form->get('password')); ?>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label" for="confirm_password">Confirm Password</label>
+			<div class="controls">
+				<?php echo $this->formRow($form->get('confirm_password')); ?>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label" for="role">Role</label>
+			<div class="controls">
+				<?php echo $this->formRow($form->get('afc_group_id')); ?>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label" for="email">Email</label>
+			<div class="controls">
+				<?php echo $this->formRow($form->get('email')); ?>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label" for="telephone">Telephone</label>
+			<div class="controls">
+				<?php echo $this->formRow($form->get('telephone')); ?>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label" for="description">Description</label>
+			<div class="controls">
+				<?php echo $this->formRow($form->get('description')); ?>
+			</div>
+		</div>
+		<div class="controls">
+            <?php echo $this->formSubmit($form->get('submit')); ?>
+		</div>
+		<?php echo $this->form()->closeTag(); ?>
+	</div>
+</div>
+
+<div id="invalid-user-add-template" class="modal hide fade">
+	<div class="modal-body">
+		<div class="alert  alert-block">
+			<button type="button" class="close" data-dismiss="modal">&times;</button>
+			<h4>Information Not Updated!</h4>
+			<h5>Please check below shown errors:</h5>
+			<div id="user-add-errors"></div>
+		</div>
+	</div>
+</div>
+<div id="valid-user-add-template" class="modal hide fade">
+	<div class="modal-body">
+		<div class="alert  alert-success">
+			<button type="button" class="close" data-dismiss="modal">&times;</button>
+			<h4>User saved successfuly</h4>
+			<div id="user-add-messages">
+				You credentials shall work now. <br /> You will now be redirected to
+				User Grid.
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+$(document).ready(function(){
+	$('textarea').wysihtml5();
+	$(document).on("submit","#add_user",function(e){
+		if(!e.isDefaultPrevented()){
+			var userAddForm = $(this);
+			var message = false;
+			userAddForm.queue(function(next){
+				message = new Message({
+                    beforeShow:function (self) {
+                        this.alternateMessage = this.showLoadingMessage("Please wait while saving user...");
+                    },
+                    onBlock:next
+                });
+			}).queue(function(next){
+				$.ajax({
+					url : userAddForm.attr("action"),
+					data : userAddForm.serialize(),
+					type : "POST",
+					dataType : "json",
+					success : function(data){
+						if(data.response && data.response.success && data.redirect_url){
+							$("#valid-user-add-template").modal("show");
+							setTimeout(function(){
+								document.location.href = data.redirect_url;
+							},1000);
+						} else {
+							$("#user-add-errors").html(data.response.message);
+							$("#invalid-user-add-template").modal("show");
+						}
+					},
+					error : function(){
+						next();
+					} 
+				}).complete(next);
+			}).queue(function(next){
+				message.close();
+				next();
+			});
+			e.preventDefault();
+		}
+	});
+});
+</script>

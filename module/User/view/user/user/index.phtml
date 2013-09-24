@@ -1,0 +1,119 @@
+<?php $this->headLink()->appendStylesheet($this->basePath() . '/libs/datatables/css/datatables.css')?>
+<?php $this->headLink()->appendStylesheet($this->basePath() . '/libs/datatables/css/datatables.bootstrap.css')?>
+
+<?php $this->headScript()->appendFile($this->basePath() . '/libs/datatables/js/datatables.min.js')?>
+<?php $this->headScript()->appendFile($this->basePath() . '/libs/datatables/js/datatables.bootstrap.js')?>
+<?php $this->headScript()->appendFile($this->basePath() . '/libs/datatables/js/datatables.aksplugin.js')?>
+<h2>
+	Users <a
+		href="<?php echo $this->url("user",array("controller"=>"user","action" => "add"));?>"
+		class="btn btn-primary pull-right">Add User</a>
+</h2>
+<div class="row-fluid margin-top20">
+	<div class="span12">
+		<table class="table" id="tblUsers">
+			<thead>
+				<tr>
+					<th>First Name</th>
+					<th>Last Name</th>
+					<th>Email</th>
+					<th>Description</th>
+					<th>Role</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td colspan="6" class="dataTables_empty"><?php echo $this->translate('Loading Users'); ?></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+<div id="delete-template" class="modal hide fade">
+	<form
+		action="<?php echo $this->url('user',array("controller"=>"user","action" => "delete"));?>"
+		method="post">
+		<input type="hidden" name="delete-user-id" id="delete-user-id"
+			value="" />
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal">x</button>
+			<h3>Confirm Delete</h3>
+		</div>
+		<div class="modal-body">
+			<p>Are you sure you want to delete <strong id="delete-target-name"></strong>?</p>
+		</div>
+		<div class="modal-footer">
+			<button class="btn" data-dismiss="modal">Close</button>
+			<input type="submit" class="btn btn-primary" value="Delete User" />
+		</div>
+	</form>
+</div>
+<script type="text/javascript">
+(function($){
+	$(document).ready(function(){
+		window.grid = dataTable({
+			"sDom": "<'row hide'<'span8'l><'span8'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
+			"sPaginationType": "bootstrap",
+			"oLanguage": {
+				"sLengthMenu": "_MENU_ records per page"
+			},
+			"aoColumns": [
+							{ "sName": "firstname" },
+							{ "sName": "lastname" },
+							{ "sName": "email" },
+							{ "sName": "description"},
+							{ "sName": "afc_group_id"},
+							{ "sName": "actions", bSortable:false}
+						 ],
+			id : $('#tblUsers'),
+			sAjaxSource: "<?php echo $this->url("user",array("controller"=>"user","action"=>"user-grid-list"));?>"
+		});
+	});
+	$(document).on("click","a.btn-primary.delete",function(e){
+		// Replace the name for categoy 
+        var deleteTemplate = $("#delete-template");
+        
+        deleteTemplate.find("#delete-target-name").html($(this).data("target-name"));
+        
+        // Replace the Category Id where the files needs to be updated
+        deleteTemplate.find("#delete-user-id").val($(this).data("target-id"));
+	});
+
+	$(document).on("submit","#delete-template form",function(e){
+    	var message = false;
+    	var self = this;
+        $(this).queue(function(next){
+        	message = new Message({
+                beforeShow:function (self) {
+                    this.alternateMessage = this.showLoadingMessage("Please wait while deleting...");
+                },
+                onBlock:next
+            });
+		}).queue(function(next){
+			var user_id = $(this).find("#delete-user-id").val();
+			$.ajax({
+				url:$(this).attr("action"),
+				dataType: 'json',
+				type : 'post',
+				data:{user_id:user_id},
+				success: function ( data )
+				{
+					if(data.success) {
+						message.showSuccessMessage("User deleted successfully!");
+						$(self).closest(".modal").modal("hide");
+						window.grid.fnDraw(false);
+					} else {
+						message.showErrorMessage("Cannot delete user!");	
+					}
+					setTimeout(next,1500);
+				}
+			});
+		}).queue(function(next){
+			message.close();
+			next();
+		});
+        e.preventDefault();
+	});
+})(jQuery);
+</script>
